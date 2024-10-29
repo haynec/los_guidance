@@ -83,7 +83,7 @@ The main packages are:
 
 These can be installed via conda or pip.
 <details>
-<summary>Via Conda (Reccomended) </summary>
+<summary>Via Conda (Recommended) </summary>
 
 1. Clone the repo
    ```sh
