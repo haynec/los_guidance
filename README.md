@@ -28,7 +28,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-<h3 align="center">Continuous-Time Line-of-Sight Constrained Trajectory Planning for Six Degree of Freedom Systems</h3>
+<h1 align="center">Continuous-Time Line-of-Sight Constrained Trajectory Planning for Six Degree of Freedom Systems</h1>
 
 <div style="display: flex; flex-wrap: wrap; justify-content: center;">
 <!--   <div style="text-align: center;"> -->
