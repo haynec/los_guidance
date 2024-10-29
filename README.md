@@ -94,9 +94,9 @@ These can be installed via conda or pip.
    conda env create -f environment.yml
    ```
 3. Activate the environment:
-  ```sh
-  conda activate los_guidance
-  ```
+   ```sh
+   conda activate los_guidance
+   ```
 
 </details>
 
