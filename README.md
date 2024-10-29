@@ -152,7 +152,7 @@ This work was supported by a NASA Space Technology Graduate Research Opportunity
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the GPL-3.0 License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
