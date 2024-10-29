@@ -158,22 +158,6 @@ Distributed under the GPL-3.0 License. See `LICENSE.txt` for more information.
 
 
 
-<!-- CONTACT -->
-## Contact
-
-Chris Hayner - haynec [at] uw [dot] com
-Project Link: [Project Page](https://haynec.github.io/papers/los/)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
