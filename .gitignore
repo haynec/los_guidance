@@ -30,8 +30,6 @@ __pycache__/
 # VSCode
 *.json
 
-# Results
-results/*
 
 # CVXPYGEN
 ctcs/*
