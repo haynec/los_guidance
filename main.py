@@ -11,6 +11,7 @@ warnings.filterwarnings("ignore")
 ###############################
 # Author: Chris Hayner
 # Autonomous Controls Laboratory
+# Copyright 2024 Chris Hayner
 ################################
 
 def load_params_from_file(file_path):
