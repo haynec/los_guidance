@@ -1,4 +1,4 @@
-name: los
+name: los_guidance
 channels:
   - conda-forge
   - defaults
