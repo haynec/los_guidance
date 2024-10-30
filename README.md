@@ -89,7 +89,7 @@ These can be installed via conda or pip.
    ```sh
    git clone https://github.com/haynec/los_guidance.git
    ```
-2. Install environment packages:
+2. Install environment packages (this will take about a minute or two):
    ```sh
    conda env create -f environment.yml
    ```
