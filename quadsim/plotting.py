@@ -1737,6 +1737,7 @@ def plot_scp_animation(result_ctcs: dict,
     drone_forces = result_ctcs["drone_forces"]
     scp_interp_trajs = result_ctcs["scp_interp"]
     scp_ctcs_trajs = result_ctcs["scp_trajs"]
+    scp_multi_shoot = result_ctcs["scp_multi_shoot"]
     obstacles = result_ctcs["obstacles"]
     gates = result_ctcs["gates"]
     subs_positions = result_ctcs["sub_positions"]
@@ -1751,7 +1752,6 @@ def plot_scp_animation(result_ctcs: dict,
     # fig.update_layout(height=1000)
 
     fig.add_trace(go.Scatter3d(x=drone_positions[:,0], y=drone_positions[:,1], z=drone_positions[:,2], mode='lines', line=dict(color='green', width = 5), name='Nonlinear Propagation'))
-    fig.add_trace(go.Scatter3d(x=scp_ctcs_trajs[-1][0], y=scp_ctcs_trajs[-1][1], z=scp_ctcs_trajs[-1][2], mode='markers', line=dict(color='grey', width = 50), name='Node Points'))
 
     if result_node is not None:
         fig.add_trace(go.Scatter3d(x=drone_positions_node[:,0], y=drone_positions_node[:,1], z=drone_positions_node[:,2], mode='lines', line=dict(color='blue', width = 5), name='Node Nonlinear Propagation'))
@@ -1762,18 +1762,41 @@ def plot_scp_animation(result_ctcs: dict,
     fig.update_layout(scene=dict(aspectmode='manual', aspectratio=dict(x=10, y=10, z=10)))
     fig.update_layout(scene=dict(xaxis=dict(range=[-200, 200]), yaxis=dict(range=[-200, 200]), zaxis=dict(range=[-200, 200])))
 
+    # Extract the number of states and controls from the parameters
+    n_x = params.sim.n_states
+    n_u = params.sim.n_controls
+
+    # Define indices for slicing the augmented state vector
+    i0 = 0
+    i1 = n_x
+    i2 = i1 + n_x * n_x
+    i3 = i2 + n_x * n_u
+    i4 = i3 + n_x * n_u
+    i5 = i4 + n_x
+
     # Plot the attitudes of the SCP Trajs
     frames = []
     traj_iter = 0
+
     for scp_traj in scp_ctcs_trajs:
         drone_positions = scp_traj[0:3]
         drone_attitudes = scp_traj[6:10]
         frame = go.Frame(name=str(traj_iter))
         data = []
-
-        # Plot drone position trajectory
-        data.append(go.Scatter3d(x=drone_positions[0], y=drone_positions[1], z=drone_positions[2], mode='lines', line=dict(color='gray', width = 5), name='CTCS SCP Iteration ' + str(traj_iter)))
+        # Plot the multiple shooting trajectories
+        pos_traj = []
+        if traj_iter < len(scp_multi_shoot):
+            for i_multi in range(scp_multi_shoot[traj_iter].shape[1]):
+                pos_traj.append(scp_multi_shoot[traj_iter][:,i_multi].reshape(-1, i5)[:,0:3])
+            pos_traj = np.array(pos_traj)
+            
+            for j in range(pos_traj.shape[1]):
+                if j == 0:
+                    data.append(go.Scatter3d(x=pos_traj[:,j, 0], y=pos_traj[:,j, 1], z=pos_traj[:,j, 2], mode='lines', legendgroup='Multishot Trajectory', name='Multishot Trajectory ' + str(traj_iter), showlegend=True, line=dict(color='blue', width = 5)))
+                else:
+                    data.append(go.Scatter3d(x=pos_traj[:,j, 0], y=pos_traj[:,j, 1], z=pos_traj[:,j, 2], mode='lines', legendgroup='Multishot Trajectory', showlegend=False, line=dict(color='blue', width = 5)))
         
+            
         for i in range(len(drone_attitudes[0])):
             att = drone_attitudes[:, i]
 
@@ -1944,22 +1967,22 @@ def plot_scp_animation(result_ctcs: dict,
     if not params.vp.tracking:
         fig.update_layout(scene_camera=dict(up=dict(x=0, y=0, z=90), center=dict(x=1, y=0.3, z=1), eye=dict(x=-1, y=2, z=1)))
 
-    # Make the background transparent
-    fig.update_layout(scene=dict(bgcolor='rgba(0,0,0,0)'))
-    # Make the axis backgrounds transparent
-    fig.update_layout(scene=dict(
-        xaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
-        yaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
-        zaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey')
-    ))
-    # Remove the plot background
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
+    # # Make the background transparent
+    # fig.update_layout(scene=dict(bgcolor='rgba(0,0,0,0)'))
+    # # Make the axis backgrounds transparent
+    # fig.update_layout(scene=dict(
+    #     xaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
+    #     yaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
+    #     zaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey')
+    # ))
+    # # Remove the plot background
+    # fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
 
-    # Make ticks themselves transparent
-    fig.update_layout(scene=dict(xaxis=dict(showticklabels=False), yaxis=dict(showticklabels=False), zaxis=dict(showticklabels=False)))
+    # # Make ticks themselves transparent
+    # fig.update_layout(scene=dict(xaxis=dict(showticklabels=False), yaxis=dict(showticklabels=False), zaxis=dict(showticklabels=False)))
 
-    # Remove the paper background
-    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    # # Remove the paper background
+    # fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
                       
 
     # Generate embded html
@@ -1967,126 +1990,7 @@ def plot_scp_animation(result_ctcs: dict,
     # Save the html string to a file
     with open(f'{path}results/scp_animation.html', 'w') as f:
         f.write(html_str)
-    fig.show()
 
-def plot_scp_animation_double_integrator(result_ctcs: dict, result_node = None):
-    tof = result_ctcs["tof"]
-    title = f'SCP Simulation: {tof} seconds'
-    drone_positions = result_ctcs["drone_positions"]
-    drone_attitudes = result_ctcs["drone_attitudes"]
-    drone_forces = result_ctcs["drone_forces"]
-    scp_interp_trajs = result_ctcs["scp_interp"]
-    scp_ctcs_trajs = result_ctcs["scp_trajs"]
-    obstacles = result_ctcs["obstacles"]
-    gates = result_ctcs["gates"]
-    if result_node is not None:
-        drone_positions_node = result_node["drone_positions"]
-        scp_node_trajs = result_node["scp_trajs"]
-
-    fig = go.Figure(go.Scatter3d(x=[], y=[], z=[], mode='lines+markers', line=dict(color='gray', width = 2), name='SCP Iterations'))
-    for j in range(200):
-        fig.add_trace(go.Scatter3d(x=[], y=[], z=[], mode='lines+markers', line=dict(color='gray', width = 2)))
-
-    # fig.update_layout(height=1000)
-
-    fig.add_trace(go.Scatter3d(x=drone_positions[:,0], y=drone_positions[:,1], z=drone_positions[:,2], mode='lines', line=dict(color='green', width = 5), name='CTCS Nonlinear Propagation'))
-    fig.add_trace(go.Scatter3d(x=scp_ctcs_trajs[-1][0], y=scp_ctcs_trajs[-1][1], z=scp_ctcs_trajs[-1][2], mode='markers', line=dict(color='grey', width = 50), name='CTCS Node Points'))
-
-    if result_node is not None:
-        fig.add_trace(go.Scatter3d(x=drone_positions_node[:,0], y=drone_positions_node[:,1], z=drone_positions_node[:,2], mode='lines', line=dict(color='blue', width = 5), name='Node Nonlinear Propagation'))
-        fig.add_trace(go.Scatter3d(x=scp_node_trajs[-1][0], y=scp_node_trajs[-1][1], z=scp_node_trajs[-1][2], mode='markers', line=dict(color='grey', width = 50), name='Node Node Points'))
-
-    fig.update_layout(template='plotly_dark', title=title)
-
-    fig.update_layout(scene=dict(aspectmode='manual', aspectratio=dict(x=10, y=10, z=10)))
-    fig.update_layout(scene=dict(xaxis=dict(range=[-200, 200]), yaxis=dict(range=[-200, 200]), zaxis=dict(range=[-200, 200])))
-
-    # Plot the attitudes of the SCP Trajs
-    frames = []
-    traj_iter = 0
-    for scp_traj in scp_ctcs_trajs:
-        drone_positions = scp_traj[0:3]
-        drone_attitudes = scp_traj[6:10]
-        frame = go.Frame(name=str(traj_iter))
-        data = []
-
-        # Plot drone position trajectory
-        data.append(go.Scatter3d(x=drone_positions[0], y=drone_positions[1], z=drone_positions[2], mode='lines', line=dict(color='gray', width = 5), name='CTCS SCP Iteration ' + str(traj_iter)))
-
-        traj_iter += 1  
-        frame.data = data
-        frames.append(frame)
-    fig.frames = frames 
-
-    i = 1
-    for obs in obstacles:
-        n = 30
-        # Generate points on the unit sphere
-        u = np.linspace(0, 2 * np.pi, n)
-        v = np.linspace(0, np.pi, n)
-
-        x = np.outer(np.cos(u), np.sin(v))
-        y = np.outer(np.sin(u), np.sin(v))
-        z = np.outer(np.ones(np.size(u)), np.cos(v))
-
-        # Scale points by radii
-        x = 1/obs.radius[0] * x
-        y = 1/obs.radius[1] * y
-        z = 1/obs.radius[2] * z
-
-        # Rotate and translate points
-        points = np.array([x.flatten(), y.flatten(), z.flatten()])
-        points = obs.axes @ points
-        points = points.T + obs.center
-
-        fig.add_trace(go.Surface(x=points[:, 0].reshape(n,n), y=points[:, 1].reshape(n,n), z=points[:, 2].reshape(n,n), opacity = 0.5, showscale=False))
-
-    for gate in gates:
-        # Plot a line through the vertices of the gate
-        fig.add_trace(go.Scatter3d(x=[gate.vertices[0][0], gate.vertices[1][0], gate.vertices[2][0], gate.vertices[3][0], gate.vertices[0][0]], y=[gate.vertices[0][1], gate.vertices[1][1], gate.vertices[2][1], gate.vertices[3][1], gate.vertices[0][1]], z=[gate.vertices[0][2], gate.vertices[1][2], gate.vertices[2][2], gate.vertices[3][2], gate.vertices[0][2]], mode='lines', line=dict(color='blue', width=10)))
-        # Plot the normal vector of the gate as an arrow
-        # fig.add_trace(go.Cone(x=[gate.center[0]], y=[gate.center[1]], z=[gate.center[2]], u=[gate.normal[0]], v=[gate.normal[1]], w=[gate.normal[2]], showscale=False, sizemode="absolute", sizeref=1.0, anchor="tail", colorscale='Viridis', colorbar=dict(title='Normal Vector')))
-
-    fig.add_trace(go.Surface(x=[-200, 200, 200, -200], y=[-200, -200, 200, 200], z=[[0, 0], [0, 0], [0, 0], [0, 0]], opacity=0.3, showscale=False, colorscale='Greys', showlegend = True, name='Ground Plane'))
-
-    sliders = [
-        {
-            "pad": {"b": 10, "t": 60},
-            "len": 0.9,
-            "x": 0.1,
-            "y": 0,
-            "steps": [
-                {
-                    "args": [[f.name], frame_args(0)],
-                    "label": f.name,
-                    "method": "animate",
-                } for f in fig.frames
-            ]
-        }
-    ]
-
-    fig.update_layout(updatemenus = [{"buttons":[
-                                        {
-                                            "args": [None, frame_args(50)],
-                                            "label": "Play",
-                                            "method": "animate",
-                                        },
-                                        {
-                                            "args": [[None], frame_args(0)],
-                                            "label": "Pause",
-                                            "method": "animate",
-                                    }],
-
-                                    "direction": "left",
-                                    "pad": {"r": 10, "t": 70},
-                                    "type": "buttons",
-                                    "x": 0.1,
-                                    "y": 0,
-                                }
-                            ],
-                            sliders=sliders
-                        )
-    fig.update_layout(sliders=sliders)
     fig.show()
 
 def plot_state(result, params):
