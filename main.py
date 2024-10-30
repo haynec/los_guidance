@@ -21,7 +21,7 @@ def load_params_from_file(file_path):
     return params_module.params
 
 def run_simulation(params):
-    print('Starting Quadrotor Simulator')
+    print('Copyright (C) 2024  Chris Hayner. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions.')
 
     params = Config.from_config(params, savedir="results/")
     results, _, _, _, _, _ = PTR_main(params) 
