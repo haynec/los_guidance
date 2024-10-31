@@ -54,16 +54,14 @@
 <!--   </div> -->
 </div>
 
+
+## Video
 [![Watch the video](figures/video_preview.png)](https://youtu.be/miYeYnfvZYs?si=aYggTma7bdm_umCP)
 
-  <p align="left">
-    Perception algorithms are ubiquitous in modern autonomy stacks, providing necessary environmental information to operate in the real world.
-    Many of these algorithms depend on the visibility of keypoints, which must remain within the robot’s line-of-sight (LoS), for reliable operation. 
-    This paper tackles the challenge of maintaining LoS on such keypoints during robot movement. 
-    We propose a novel method that addresses these issues by ensuring applicability to various sensor footprints, adaptability to arbitrary nonlinear dynamics and constantly enforces LoS throughout the robot's path. 
-    We show through our experiments that the proposed approach achieves significantly reduced LoS violation and runtime when compared to existing state-of-the-art methods in several representative and challenging scenarios.
-    <br />
-  </p>
+<p align="left">
+Perception algorithms are ubiquitous in modern autonomy stacks, providing necessary environmental information to operate in the real world. Many of these algorithms depend on the visibility of keypoints, which must remain within the robot’s line-of-sight (LoS), for reliable operation. This paper tackles the challenge of maintaining LoS on such keypoints during robot movement. We propose a novel method that addresses these issues by ensuring applicability to various sensor footprints, adaptability to arbitrary nonlinear dynamics and constantly enforces LoS throughout the robot's path. We show through our experiments that the proposed approach achieves significantly reduced LoS violation and runtime when compared to existing state-of-the-art methods in several representative and challenging scenarios.
+<br />
+</p>
 </div>
 
 <!-- GETTING STARTED -->
@@ -155,6 +153,20 @@ This work was supported by a NASA Space Technology Graduate Research Opportunity
 Distributed under the GPL-3.0 License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Citation
+Please cite as 
+```
+@misc{hayner2024los,
+                  title={Continuous-Time Line-of-Sight Constrained Trajectory Planning for 6-Degree of Freedom Systems}, 
+                  author={Christopher R. Hayner and John M. Carson III and Behçet Açıkmeşe and Karen Leung},
+                  year={2024},
+                  eprint={2410.22596},
+                  archivePrefix={arXiv},
+                  primaryClass={math.OC},
+                  url={https://arxiv.org/abs/2410.22596}, 
+            }
+```
 
 
 
