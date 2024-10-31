@@ -81,6 +81,7 @@ def PTR_main(params):
 
     scp_trajs = [x_bar]
     scp_controls = [u_bar]
+    V_multi_shoot_traj = []
 
     # Define colors for printing
     col_main = "blue"
@@ -99,7 +100,9 @@ def PTR_main(params):
 
     t_0_while = time.time()
     while k <= params.scp.k_max and ((J_tr >= params.scp.ep_tr) or (J_vb >= params.scp.ep_vb) or (J_vc >= params.scp.ep_vc) or (J_vc_ctcs >= params.scp.ep_vc_ctcs)):
-        x, u, t, J_total, J_vb_vec, J_vc_vec, J_tr_vec, J_vc_ctcs_vec, prob_stat = PTR_subproblem(cpg_solve, x_bar, u_bar, A, B, obstacles, subs, prob, sub_jax, quad_jax, params)
+        x, u, t, J_total, J_vb_vec, J_vc_vec, J_tr_vec, J_vc_ctcs_vec, prob_stat, V_multi_shoot = PTR_subproblem(cpg_solve, x_bar, u_bar, A, B, obstacles, subs, prob, sub_jax, quad_jax, params)
+
+        V_multi_shoot_traj.append(V_multi_shoot)
 
         x_bar = x
         u_bar = u
@@ -200,6 +203,7 @@ def PTR_main(params):
         sub_positions = x_sub_full,
         sub_positions_sen = x_sub_sen,
         sub_positions_sen_node = x_sub_sen_node,
+        scp_multi_shoot = V_multi_shoot_traj,
         scp_trajs = scp_trajs,
         scp_controls = scp_controls,
         obstacles = obstacles,
@@ -265,7 +269,7 @@ def PTR_subproblem(cpg_solve, x_bar, u_bar, A, B, obstacles, subs, prob, sub_jax
     prob.param_dict['x_bar'].value = x_bar
     prob.param_dict['u_bar'].value = u_bar
     
-    A_bar, B_bar, C_bar, z_bar = calculate_discretization(x_bar, u_bar, A, B, obstacles, subs, sub_jax, quad_jax, params)
+    A_bar, B_bar, C_bar, z_bar, V_multi_shoot = calculate_discretization(x_bar, u_bar, A, B, obstacles, subs, sub_jax, quad_jax, params)
     prob.param_dict['A_d'].value = A_bar
     prob.param_dict['B_d'].value = B_bar
     prob.param_dict['C_d'].value = C_bar
@@ -326,7 +330,7 @@ def PTR_subproblem(cpg_solve, x_bar, u_bar, A, B, obstacles, subs, prob, sub_jax
         J_vb_vec.append(J_vb)
         J_vc_vec.append(np.sum(np.abs(prob.var_dict['nu'].value[:-1,k-1])))
         J_vc_ctcs_vec.append(np.sum(np.abs(prob.var_dict['nu'].value[-1,k-1])))
-    return x, u, np.array(t), prob.value, J_vb_vec, J_vc_vec, J_tr_vec, J_vc_ctcs_vec, prob.status
+    return x, u, np.array(t), prob.value, J_vb_vec, J_vc_vec, J_tr_vec, J_vc_ctcs_vec, prob.status, V_multi_shoot
 
 def scp_init(x : np.ndarray,
                        u : np.ndarray,

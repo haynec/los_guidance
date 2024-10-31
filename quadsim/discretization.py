@@ -75,7 +75,10 @@ def calculate_discretization(x: np.ndarray,
 
     # Vectorized integration
     V0[:, i0:i1] = x[:, :-1].T
-    V = itg.solve_ivp(dVdt, (tau[0], tau[1]), V0.flatten(), args=(u[:, :-1].T, u[:, 1:].T, A, B, obstacles, subs, tau[0], np.array(t_vals[:-1]), sub_jax, quad_jax, params), method='RK45').y[:, -1].reshape(-1, i5)
+    int_result = itg.solve_ivp(dVdt, (tau[0], tau[1]), V0.flatten(), args=(u[:, :-1].T, u[:, 1:].T, A, B, obstacles, subs, tau[0], np.array(t_vals[:-1]), sub_jax, quad_jax, params), method='RK45', t_eval=np.linspace(tau[0], tau[1], 50))
+    V = int_result.y[:,-1].reshape(-1, i5)
+
+    V_multi_shoot = int_result.y
 
     # Flatten matrices in column-major (Fortran) order for cvxpy
     A_bar = V[:, i1:i2].reshape((params.scp.n - 1, n_x, n_x)).transpose(1, 2, 0).reshape(n_x * n_x, -1, order='F')
@@ -83,7 +86,7 @@ def calculate_discretization(x: np.ndarray,
     C_bar = V[:, i3:i4].reshape((params.scp.n - 1, n_x, n_u)).transpose(1, 2, 0).reshape(n_x * n_u, -1, order='F')
     z_bar = V[:, i4:i5].T
 
-    return A_bar, B_bar, C_bar, z_bar
+    return A_bar, B_bar, C_bar, z_bar, V_multi_shoot
 
 def dVdt(tau: float,
              V_seq: np.ndarray,
