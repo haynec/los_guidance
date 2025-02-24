@@ -34,4 +34,15 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest test_main.py
+        pytest test_main.py --params-file quadsim/params/dr_vp.py
+        pytest test_main.py --params-file quadsim/params/dr_vp_nodal.py
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py
+        pytest test_main.py --params-file quadsim/params/cinema_vp_nodal.py
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot trajectory
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot camera_view
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot conic_view
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot scp_iters
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot constr_vio
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot control
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot state
+        pytest test_main.py --params-file quadsim/params/cinema_vp.py --plot losses
