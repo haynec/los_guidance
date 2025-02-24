@@ -105,7 +105,7 @@ These can be installed via conda or pip.
 <summary>Via Pip</summary>
 
 0. Prerequisites
-   Python = 3.11
+   Python >= 3.9
 1. Clone the repo
    ```sh
    git clone https://github.com/haynec/los_guidance.git
