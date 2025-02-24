@@ -1,6 +1,6 @@
 import subprocess
 
-def run_main_with_params():
+def test_main():
     params_files = [
         'quadsim/params/cinema_vp.py',
         'quadsim/params/cinema_vp_nodal.py',
