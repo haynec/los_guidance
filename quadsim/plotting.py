@@ -204,9 +204,6 @@ def plot_camera_view(result: dict, params) -> None:
     # Set aspect ratio to be equal
     fig.update_layout(autosize=False, width=800, height=800)
 
-    # Save figure as svg
-    fig.write_image("figures/camera_view.svg")
-
     fig.show()
 
 def plot_camera_view_ral(result: dict, params) -> None:
@@ -306,8 +303,6 @@ def plot_camera_view_ral(result: dict, params) -> None:
     # Set aspect ratio to be equal
     fig.update_layout(autosize=False, width=800, height=800)
 
-    # Save figure as svg
-    fig.write_image("figures/camera_view.svg")
 
     fig.show()
 
@@ -772,8 +767,6 @@ def plot_conic_view_ral(result: dict, params) -> None:
     fig.update_layout(scene=dict(aspectmode='manual', aspectratio=dict(x=20, y=20, z=20)))
     fig.update_layout(autosize=False, width=800, height=800)
 
-    # Save figure as svg
-    fig.write_image("figures/conic_constraint.svg")
 
     fig.show()
 
