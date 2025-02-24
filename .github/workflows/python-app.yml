@@ -31,8 +31,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest
-        python main.py --params-file quadsim/params/cinema_vp.py
 
     - name: Run tests
       run: |
-        pytest
+        pytest test_main.py
