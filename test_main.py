@@ -1,26 +1,32 @@
 import subprocess
 
-def run_main_with_params(params):
-    result = subprocess.run(['python', 'main.py', '--params-file', 'quadsim/params/cinema_vp.py', '--plot', params], capture_output=True, text=True)
-    assert result.returncode == 0, f"Process failed with return code {result.returncode}\n{result.stdout}\n{result.stderr}"
+def run_main_with_params():
+    params_files = [
+        'quadsim/params/cinema_vp.py',
+        'quadsim/params/camera_view.py',
+        'quadsim/params/conic_view.py',
+        'quadsim/params/scp_iters.py',
+        'quadsim/params/constr_vio.py',
+        'quadsim/params/control_losses.py',
+        'quadsim/params/state.py',
+        'quadsim/params/dr_vp.py',
+        'quadsim/params/dr_vp_nodal.py',
+        'quadsim/params/cinema_vp_nodal.py'
+    ]
 
-def test_trajectory():
-    run_main_with_params('trajectory')
+    plots = [
+        'trajectory',
+        'camera_view',
+        'conic_view',
+        'scp_iters',
+        'constr_vio',
+        'control_losses',
+        'state',
+        'dr_vp',
+        'dr_vp_nodal',
+        'cinema_vp_nodal'
+    ]
 
-# def test_camera_view():
-#     run_main_with_params('camera_view')
-
-# def test_conic_view():
-#     run_main_with_params('conic_view')
-
-# def test_scp_iters():
-#     run_main_with_params('scp_iters')
-
-# def test_constr_vio():
-#     run_main_with_params('constr_vio')
-
-# def test_control_losses():
-#     run_main_with_params('control_losses')
-
-# def test_state():
-#     run_main_with_params('state')
+    for params_file, plot in zip(params_files, plots):
+        result = subprocess.run(['python', 'main.py', '--params-file', params_file, '--plot', plot], capture_output=True, text=True)
+        assert result.returncode == 0, f"Process failed with return code {result.returncode}\n{result.stdout}\n{result.stderr}"
