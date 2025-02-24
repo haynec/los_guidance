@@ -31,14 +31,14 @@ sim = SimConfig(
     n_states = 15,  # Number of States
 )
 scp = ScpConfig(
-    n=18,  # Number of Nodes
+    n=10,  # Number of Nodes
     fixed_final_time=True,  # Whether to fix the final time
     min_fuel=True,  # Whether to minimize fuel
     w_tr=1E1,  # Weight on the Trust Reigon
     lam_fuel=1E0,  # Weight on the Minimal Fuel Objective
     lam_t=0e0,  # Weight on the Minimal Time Objective
     lam_vc=1E1,  # Weight on the Virtual Control Objective (not including CTCS Augmentation)
-    lam_vc_ctcs=1.1E2,  # Weight on the Virtual Control Objective for only CTCS
+    lam_vc_ctcs=1E1,  # Weight on the Virtual Control Objective for only CTCS
     ep_tr=1e-4,  # Trust Region Tolerance
     ep_vb=1e-4,  # Virtual Control Tolerance
     ep_vc=1e-8,  # Virtual Control Tolerance for CTCS

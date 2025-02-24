@@ -11,7 +11,6 @@ warnings.filterwarnings("ignore")
 ###############################
 # Author: Chris Hayner
 # Autonomous Controls Laboratory
-# Copyright 2024 Chris Hayner
 ################################
 
 def load_params_from_file(file_path):
@@ -21,7 +20,7 @@ def load_params_from_file(file_path):
     return params_module.params
 
 def run_simulation(params):
-    print('Copyright (C) 2024  Chris Hayner. This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions.')
+    print('Starting Quadrotor Simulator')
 
     params = Config.from_config(params, savedir="results/")
     results, _, _, _, _, _ = PTR_main(params) 
@@ -40,7 +39,7 @@ def plot_results(results, params, plots):
     if 'trajectory' in plots:
         plot_animation(results, params)
     if 'camera_view' in plots:
-        plot_camera_animation(results, params)
+        plot_camera_view_ral(results, params)
     if 'conic_view' in plots:
         plot_conic_view_animation(results, params)
     if 'scp_iters' in plots:
@@ -53,7 +52,6 @@ def plot_results(results, params, plots):
         plot_losses(results, params)
     if 'state' in plots:
         plot_state(results, params)
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run Simulator with specified parameters.")

@@ -7,7 +7,6 @@ __pycache__/
 *.so
 
 # Images
-*.pyc
 
 *.eps
 *.svg
@@ -30,6 +29,8 @@ __pycache__/
 # VSCode
 *.json
 
+# Results
+results/*
 
 # CVXPYGEN
 ctcs/*

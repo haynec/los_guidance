@@ -32,7 +32,7 @@ sim = SimConfig(
     total_time=total_time,
 )
 scp = ScpConfig(
-    n=33,  # Number of Nodes
+    n=22,  # Number of Nodes
     w_tr=2e0,  # Weight on the Trust Reigon
     lam_o=0e0,  # Weight on the Nodal Obstacle Avoidance (not used for CTCS)
     lam_vp=0e0,  # Weight on the Nodal Virtual Point Avoidance (not used for CTCS)
@@ -74,8 +74,8 @@ racing = RacingConfig(
         np.array([59.436, -81.358, 20.0000]),
         np.array([22.250, -42.672, 20.0000]),
     ],
-    # gate_nodes = np.array([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]),
-    gate_nodes = np.array([3, 6, 9, 12, 15, 18, 21, 24, 27, 30]),
+    gate_nodes = np.array([2, 4, 6, 8, 10, 12, 14, 16, 18, 20]),
+    # gate_nodes = np.array([3, 6, 9, 12, 15, 18, 21, 24, 27, 30]),
     # gate_nodes = np.array([4, 8, 12, 16, 20, 24, 28, 32, 36, 40]),
     # gate_nodes = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
     # gate_nodes = np.array([8, 16, 24, 32, 40, 48, 56, 64, 72, 80])

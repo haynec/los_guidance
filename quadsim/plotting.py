@@ -226,7 +226,7 @@ def plot_camera_view_ral(result: dict, params) -> None:
         sub_traj_nodal = np.array(sub_positions_sen_node[sub_idx])
         sub_traj_nodal[:,0] = sub_traj_nodal[:,0] / sub_traj_nodal[:,2]
         sub_traj_nodal[:,1] = sub_traj_nodal[:,1] / sub_traj_nodal[:,2]
-        fig.add_trace(go.Scatter(x=sub_traj_nodal[:, 0], y=sub_traj_nodal[:, 1], mode='markers',marker=dict(color=color, size=20), showlegend=False))
+        fig.add_trace(go.Scatter(x=sub_traj_nodal[:, 0], y=sub_traj_nodal[:, 1], mode='markers',marker=dict(color=color, size=10, symbol="x-thin", line=dict(width=2, color=color)), showlegend=False))
         sub_idx += 1
     
     # Create a cone plot
@@ -272,8 +272,8 @@ def plot_camera_view_ral(result: dict, params) -> None:
     X = np.append(X, X[0])
     Y = np.append(Y, Y[0])
 
-    # Plot the points on a red scatter plot
-    fig.add_trace(go.Scatter(x=X, y=Y, mode='lines', line=dict(color='red', width=5), showlegend=False))
+    # Plot the points on a semi-transperent red using rgba scatter plot
+    fig.add_trace(go.Scatter(x=X, y=Y, mode='lines', line=dict(color='rgba(255, 0, 0, 0.5)', width=5), showlegend=False))
 
     # Center the title for the plot
     # fig.update_layout(title=title, title_x=0.5)
@@ -1198,147 +1198,147 @@ def plot_main_ral_dr(result: dict,
     # ind = np.arange(0, len(indices), 30)
     
 
-    #   Draw drone attitudes as axes
-    for i in ind[::4]:
-        att = drone_attitudes[indices[i]]
+    # #   Draw drone attitudes as axes
+    # for i in ind[::4]:
+    #     att = drone_attitudes[indices[i]]
 
-        subs_pose = []
+    subs_pose = []
 
-        for sub_positions in subs_positions:
-            subs_pose.append(sub_positions[indices[i]])
+    for sub_positions in subs_positions:
+        subs_pose.append(sub_positions[indices[i]])
         
-        # Convert quaternion to rotation matrix
-        rotation_matrix = qdcm(att)
+    #     # Convert quaternion to rotation matrix
+    #     rotation_matrix = qdcm(att)
 
-        force = 0.5 * rotation_matrix @ drone_forces[indices[i]]
+    #     force = 0.5 * rotation_matrix @ drone_forces[indices[i]]
 
-        # Extract axes from rotation matrix
-        if params.vp.n_subs != 0:
-            axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        else:
-            axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    #     # Extract axes from rotation matrix
+    #     if params.vp.n_subs != 0:
+    #         axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    #     else:
+    #         axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
             
-        rotated_axes = np.dot(rotation_matrix, axes).T
+    #     rotated_axes = np.dot(rotation_matrix, axes).T
 
-        if result_nodal is not None:
-            att_nodal = drone_attitudes_nodal[indices[i]]
-            rotation_matrix_nodal = qdcm(att_nodal)
+    #     if result_nodal is not None:
+    #         att_nodal = drone_attitudes_nodal[indices[i]]
+    #         rotation_matrix_nodal = qdcm(att_nodal)
             
-            force_nodal = 0.5 * rotation_matrix_nodal @ drone_forces_nodal[indices[i]]
+    #         force_nodal = 0.5 * rotation_matrix_nodal @ drone_forces_nodal[indices[i]]
 
-            # Extract axes from rotation matrix
-            rotated_axes_nodal = np.dot(rotation_matrix_nodal, axes).T
+    #         # Extract axes from rotation matrix
+    #         rotated_axes_nodal = np.dot(rotation_matrix_nodal, axes).T
 
-        # Meshgrid
-        if params.vp.tracking:    
-            x = np.linspace(-10, 10, 100)
-            y = np.linspace(-10, 10, 100)
-            z = np.linspace(-10, 10, 100)
-        else:
-            x = np.linspace(-8, 8, 200)
-            y = np.linspace(-8, 8, 200)
-            z = np.linspace(-8, 8, 200)
+    #     # Meshgrid
+    #     if params.vp.tracking:    
+    #         x = np.linspace(-10, 10, 100)
+    #         y = np.linspace(-10, 10, 100)
+    #         z = np.linspace(-10, 10, 100)
+    #     else:
+    #         x = np.linspace(-8, 8, 200)
+    #         y = np.linspace(-8, 8, 200)
+    #         z = np.linspace(-8, 8, 200)
         
         
-        X, Y = np.meshgrid(x, y)
+    #     X, Y = np.meshgrid(x, y)
 
-        # Define the condition for the second order cone
-        A = np.diag([1 / np.tan(np.pi / params.vp.alpha_y), 1 / np.tan(np.pi / params.vp.alpha_x)])  # Conic Matrix
-        z = []
-        for x_val in x:
-            for y_val in y:
-                if params.vp.norm == 'inf':
-                    z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = np.inf))
-                else:
-                    z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = params.vp.norm))
-        Z = np.array(z).reshape(200,200)
+    #     # Define the condition for the second order cone
+    #     A = np.diag([1 / np.tan(np.pi / params.vp.alpha_y), 1 / np.tan(np.pi / params.vp.alpha_x)])  # Conic Matrix
+    #     z = []
+    #     for x_val in x:
+    #         for y_val in y:
+    #             if params.vp.norm == 'inf':
+    #                 z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = np.inf))
+    #             else:
+    #                 z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = params.vp.norm))
+    #     Z = np.array(z).reshape(200,200)
 
-        # Remove points from the meshgrid that have a Z valuye above 60 but make sure to keep the shape of the meshgrid
-        X_org = np.where(Z < 10, X, np.nan)
-        Y_org = np.where(Z < 10, Y, np.nan)
-        Z_org = np.where(Z < 10, Z, np.nan)
+    #     # Remove points from the meshgrid that have a Z valuye above 60 but make sure to keep the shape of the meshgrid
+    #     X_org = np.where(Z < 10, X, np.nan)
+    #     Y_org = np.where(Z < 10, Y, np.nan)
+    #     Z_org = np.where(Z < 10, Z, np.nan)
 
-        # Transform X,Y, and Z from the Sensor frame to the Body frame using R_sb
-        R_sb = params.vp.R_sb
-        X, Y, Z = R_sb.T @ np.array([X_org.flatten(), Y_org.flatten(), Z_org.flatten()])
-        # Transform X,Y, and Z from the Body frame to the Inertial frame
-        R_bi = qdcm(drone_attitudes[indices[i]])
-        X, Y, Z = R_bi @ np.array([X, Y, Z])
-        # Shift the meshgrid to the drone position
-        X += drone_positions[indices[i], 0]
-        Y += drone_positions[indices[i], 1]
-        Z += drone_positions[indices[i], 2]
+    #     # Transform X,Y, and Z from the Sensor frame to the Body frame using R_sb
+    #     R_sb = params.vp.R_sb
+    #     X, Y, Z = R_sb.T @ np.array([X_org.flatten(), Y_org.flatten(), Z_org.flatten()])
+    #     # Transform X,Y, and Z from the Body frame to the Inertial frame
+    #     R_bi = qdcm(drone_attitudes[indices[i]])
+    #     X, Y, Z = R_bi @ np.array([X, Y, Z])
+    #     # Shift the meshgrid to the drone position
+    #     X += drone_positions[indices[i], 0]
+    #     Y += drone_positions[indices[i], 1]
+    #     Z += drone_positions[indices[i], 2]
 
-        # Make X, Y, Z back into a meshgrid
-        X = X.reshape(200,200)
-        Y = Y.reshape(200,200)
-        Z = Z.reshape(200,200)
+    #     # Make X, Y, Z back into a meshgrid
+    #     X = X.reshape(200,200)
+    #     Y = Y.reshape(200,200)
+    #     Z = Z.reshape(200,200)
 
-        if result_nodal is not None:
-            R_bi_nodal = qdcm(drone_attitudes_nodal[indices[i]])
-            X_nodal, Y_nodal, Z_nodal = R_sb.T @ np.array([X_org.flatten(), Y_org.flatten(), Z_org.flatten()])
-            X_nodal, Y_nodal, Z_nodal = R_bi_nodal @ np.array([X_nodal.flatten(), Y_nodal.flatten(), Z_nodal.flatten()])
+    #     if result_nodal is not None:
+    #         R_bi_nodal = qdcm(drone_attitudes_nodal[indices[i]])
+    #         X_nodal, Y_nodal, Z_nodal = R_sb.T @ np.array([X_org.flatten(), Y_org.flatten(), Z_org.flatten()])
+    #         X_nodal, Y_nodal, Z_nodal = R_bi_nodal @ np.array([X_nodal.flatten(), Y_nodal.flatten(), Z_nodal.flatten()])
 
-            X_nodal += drone_positions_nodal[indices[i], 0]
-            Y_nodal += drone_positions_nodal[indices[i], 1]
-            Z_nodal += drone_positions_nodal[indices[i], 2]
+    #         X_nodal += drone_positions_nodal[indices[i], 0]
+    #         Y_nodal += drone_positions_nodal[indices[i], 1]
+    #         Z_nodal += drone_positions_nodal[indices[i], 2]
 
-            X_nodal = X_nodal.reshape(200,200)
-            Y_nodal = Y_nodal.reshape(200,200)
-            Z_nodal = Z_nodal.reshape(200,200)
+    #         X_nodal = X_nodal.reshape(200,200)
+    #         Y_nodal = Y_nodal.reshape(200,200)
+    #         Z_nodal = Z_nodal.reshape(200,200)
 
-        data = []
+    #     data = []
         
-        if params.vp.n_subs != 0:
-            fig.add_trace(go.Surface(x=X, y=Y, z=Z, opacity = 0.25, showscale=False, colorscale='Thermal'))
-            # if result_nodal is not None:
-            #     fig.add_trace(go.Surface(x=X_nodal, y=Y_nodal, z=Z_nodal, opacity = 0.25, showscale=False, colorscale='Tempo'))
+    #     if params.vp.n_subs != 0:
+    #         fig.add_trace(go.Surface(x=X, y=Y, z=Z, opacity = 0.25, showscale=False, colorscale='Thermal'))
+    #         # if result_nodal is not None:
+    #         #     fig.add_trace(go.Surface(x=X_nodal, y=Y_nodal, z=Z_nodal, opacity = 0.25, showscale=False, colorscale='Tempo'))
 
-        colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFFFF']
-        labels = ['X', 'Y', 'Z', 'Force']
+    #     colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFFFF']
+    #     labels = ['X', 'Y', 'Z', 'Force']
 
-        for k in range(3):
-            if k < 3:
-                axis = rotated_axes[k]
-                if result_nodal is not None:
-                    axis_nodal = rotated_axes_nodal[k]
-            color = colors[k]
-            label = labels[k]
+    #     for k in range(3):
+    #         if k < 3:
+    #             axis = rotated_axes[k]
+    #             if result_nodal is not None:
+    #                 axis_nodal = rotated_axes_nodal[k]
+    #         color = colors[k]
+    #         label = labels[k]
 
-            if label == 'Force':
-                fig.add_trace(go.Scatter3d(
-                    x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + force[0]],
-                    y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + force[1]],
-                    z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + force[2]],
-                    mode='lines',
-                    line=dict(color=color, width=4),
-                    showlegend=False
-                ))
-            else:
-                fig.add_trace(go.Scatter3d(
-                    x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + axis[0]],
-                    y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + axis[1]],
-                    z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + axis[2]],
-                    mode='lines',
-                    line=dict(color=color, width=4),
-                    showlegend=False
-                ))
+    #         if label == 'Force':
+    #             fig.add_trace(go.Scatter3d(
+    #                 x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + force[0]],
+    #                 y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + force[1]],
+    #                 z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + force[2]],
+    #                 mode='lines',
+    #                 line=dict(color=color, width=4),
+    #                 showlegend=False
+    #             ))
+    #         else:
+    #             fig.add_trace(go.Scatter3d(
+    #                 x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + axis[0]],
+    #                 y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + axis[1]],
+    #                 z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + axis[2]],
+    #                 mode='lines',
+    #                 line=dict(color=color, width=4),
+    #                 showlegend=False
+    #             ))
 
-            if result_nodal is not None:
-                fig.add_trace(go.Scatter3d(
-                    x=[drone_positions_nodal[indices[i], 0], drone_positions_nodal[indices[i], 0] + axis_nodal[0]],
-                    y=[drone_positions_nodal[indices[i], 1], drone_positions_nodal[indices[i], 1] + axis_nodal[1]],
-                    z=[drone_positions_nodal[indices[i], 2], drone_positions_nodal[indices[i], 2] + axis_nodal[2]],
-                    mode='lines',
-                    line=dict(color=color, width=4),
-                    showlegend=False
-                ))
+    #         if result_nodal is not None:
+    #             fig.add_trace(go.Scatter3d(
+    #                 x=[drone_positions_nodal[indices[i], 0], drone_positions_nodal[indices[i], 0] + axis_nodal[0]],
+    #                 y=[drone_positions_nodal[indices[i], 1], drone_positions_nodal[indices[i], 1] + axis_nodal[1]],
+    #                 z=[drone_positions_nodal[indices[i], 2], drone_positions_nodal[indices[i], 2] + axis_nodal[2]],
+    #                 mode='lines',
+    #                 line=dict(color=color, width=4),
+    #                 showlegend=False
+    #             ))
             
-        # Add subject position to data
-        for sub_pose in subs_pose:
-            # Use color iter to change the color of the subject in rgb
-            color = color = f'rgb({random.randint(0,255)}, {random.randint(0,255)}, {random.randint(0,255)})'
-            fig.add_trace(go.Scatter3d(x=[sub_pose[0]], y=[sub_pose[1]], z=[sub_pose[2]], mode='markers', marker=dict(size=10, color=color), name='Subject', showlegend=False))
+    #     # Add subject position to data
+    for sub_pose in subs_pose:
+        # Use color iter to change the color of the subject in rgb
+        color = color = f'rgb({random.randint(0,255)}, {random.randint(0,255)}, {random.randint(0,255)})'
+        fig.add_trace(go.Scatter3d(x=[sub_pose[0]], y=[sub_pose[1]], z=[sub_pose[2]], mode='markers', marker=dict(size=10, color=color), name='Subject', showlegend=False))
             
 
     for obs in obstacles:
@@ -1485,7 +1485,7 @@ def plot_main_ral_cine(result: dict,
 
     # Plot single subject positions
     for sub_positions in subs_positions:
-        fig.add_trace(go.Scatter3d(x=sub_positions[:,0], y=sub_positions[:,1], z=sub_positions[:,2], mode='lines', line=dict(color='red', width = 5), showlegend=False))
+        fig.add_trace(go.Scatter3d(x=sub_positions[:,0], y=sub_positions[:,1], z=sub_positions[:,2], mode='lines', line=dict(color='blue', width = 5), showlegend=False))
 
     i = 0
     
@@ -1497,145 +1497,145 @@ def plot_main_ral_cine(result: dict,
     color = color = f'rgb({random.randint(0,255)}, {random.randint(0,255)}, {random.randint(0,255)})'
 
     #   Draw drone attitudes as axes
-    for i in ind:
-        att = drone_attitudes[indices[i]]
+    # for i in ind:
+    #     att = drone_attitudes[indices[i]]
 
-        subs_pose = []
+    #     subs_pose = []
 
-        for sub_positions in subs_positions:
-            subs_pose.append(sub_positions[indices[i]])
+    #     for sub_positions in subs_positions:
+    #         subs_pose.append(sub_positions[indices[i]])
         
 
         
-        # Convert quaternion to rotation matrix
-        rotation_matrix = qdcm(att)
+    #     # Convert quaternion to rotation matrix
+    #     rotation_matrix = qdcm(att)
 
-        force = 0.5 * rotation_matrix @ drone_forces[indices[i]]
+    #     force = 0.5 * rotation_matrix @ drone_forces[indices[i]]
 
-        # Extract axes from rotation matrix
-        if params.vp.n_subs != 0:
-            axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
-        else:
-            axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    #     # Extract axes from rotation matrix
+    #     if params.vp.n_subs != 0:
+    #         axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    #     else:
+    #         axes = 2 * np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
             
-        rotated_axes = np.dot(rotation_matrix, axes).T
+    #     rotated_axes = np.dot(rotation_matrix, axes).T
 
-        if results_nodal is not None:
-            att_nodal = drone_attitudes_nodal[indices[i]]
-            rotation_matrix_nodal = qdcm(att_nodal)
+    #     if results_nodal is not None:
+    #         att_nodal = drone_attitudes_nodal[indices[i]]
+    #         rotation_matrix_nodal = qdcm(att_nodal)
         
-            # Extract axes from rotation matrix
-            rotated_axes_nodal = np.dot(rotation_matrix_nodal, axes).T
+    #         # Extract axes from rotation matrix
+    #         rotated_axes_nodal = np.dot(rotation_matrix_nodal, axes).T
 
-        # Meshgrid
-        if params.vp.tracking:    
-            x = np.linspace(-10, 10, 100)
-            y = np.linspace(-10, 10, 100)
-            z = np.linspace(-10, 10, 100)
-        else:
-            x = np.linspace(-8, 8, 1000)
-            y = np.linspace(-8, 8, 1000)
-            z = np.linspace(-8, 8, 1000)
+    #     # Meshgrid
+    #     if params.vp.tracking:    
+    #         x = np.linspace(-10, 10, 100)
+    #         y = np.linspace(-10, 10, 100)
+    #         z = np.linspace(-10, 10, 100)
+    #     else:
+    #         x = np.linspace(-8, 8, 1000)
+    #         y = np.linspace(-8, 8, 1000)
+    #         z = np.linspace(-8, 8, 1000)
         
         
-        X, Y = np.meshgrid(x, y)
+    #     X, Y = np.meshgrid(x, y)
 
-        # Define the condition for the second order cone
-        A = np.diag([1 / np.tan(np.pi / params.vp.alpha_y), 1 / np.tan(np.pi / params.vp.alpha_x)])  # Conic Matrix
-        z = []
-        for x_val in x:
-            for y_val in y:
-                if params.vp.norm == 'inf':
-                    z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = np.inf))
-                else:
-                    z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = params.vp.norm))
-        Z = np.array(z).reshape(100,100)
+    #     # Define the condition for the second order cone
+    #     A = np.diag([1 / np.tan(np.pi / params.vp.alpha_y), 1 / np.tan(np.pi / params.vp.alpha_x)])  # Conic Matrix
+    #     z = []
+    #     for x_val in x:
+    #         for y_val in y:
+    #             if params.vp.norm == 'inf':
+    #                 z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = np.inf))
+    #             else:
+    #                 z.append(np.linalg.norm(A @ np.array([x_val, y_val]), axis=0, ord = params.vp.norm))
+    #     Z = np.array(z).reshape(100,100)
 
-        # Remove points from the meshgrid that have a Z valuye above 60 but make sure to keep the shape of the meshgrid
-        X = np.where(Z < 10, X, np.nan)
-        Y = np.where(Z < 10, Y, np.nan)
-        Z = np.where(Z < 10, Z, np.nan)
+    #     # Remove points from the meshgrid that have a Z valuye above 60 but make sure to keep the shape of the meshgrid
+    #     X = np.where(Z < 10, X, np.nan)
+    #     Y = np.where(Z < 10, Y, np.nan)
+    #     Z = np.where(Z < 10, Z, np.nan)
 
-        # Transform X,Y, and Z from the Sensor frame to the Body frame using R_sb
-        R_sb = params.vp.R_sb
-        X_org, Y_org, Z_org = R_sb.T @ np.array([X.flatten(), Y.flatten(), Z.flatten()])
-        # Transform X,Y, and Z from the Body frame to the Inertial frame
-        R_bi = qdcm(drone_attitudes[indices[i]])
+    #     # Transform X,Y, and Z from the Sensor frame to the Body frame using R_sb
+    #     R_sb = params.vp.R_sb
+    #     X_org, Y_org, Z_org = R_sb.T @ np.array([X.flatten(), Y.flatten(), Z.flatten()])
+    #     # Transform X,Y, and Z from the Body frame to the Inertial frame
+    #     R_bi = qdcm(drone_attitudes[indices[i]])
 
-        X, Y, Z = R_bi @ np.array([X_org, Y_org, Z_org])
-        # Shift the meshgrid to the drone position
-        X += drone_positions[indices[i], 0]
-        Y += drone_positions[indices[i], 1]
-        Z += drone_positions[indices[i], 2]
+    #     X, Y, Z = R_bi @ np.array([X_org, Y_org, Z_org])
+    #     # Shift the meshgrid to the drone position
+    #     X += drone_positions[indices[i], 0]
+    #     Y += drone_positions[indices[i], 1]
+    #     Z += drone_positions[indices[i], 2]
 
-        # Make X, Y, Z back into a meshgrid
-        X = X.reshape(100,100)
-        Y = Y.reshape(100,100)
-        Z = Z.reshape(100,100)
+    #     # Make X, Y, Z back into a meshgrid
+    #     X = X.reshape(100,100)
+    #     Y = Y.reshape(100,100)
+    #     Z = Z.reshape(100,100)
 
-        data = []
+    #     data = []
         
-        if params.vp.n_subs != 0:
-            fig.add_trace(go.Surface(x=X, y=Y, z=Z, opacity = 0.25, showscale=False, colorscale='Thermal'))
+    #     if params.vp.n_subs != 0:
+    #         fig.add_trace(go.Surface(x=X, y=Y, z=Z, opacity = 0.25, showscale=False, colorscale='Thermal'))
 
-        if results_nodal is not None:
-            R_bi_nodal = qdcm(drone_attitudes_nodal[indices[i]])
+    #     if results_nodal is not None:
+    #         R_bi_nodal = qdcm(drone_attitudes_nodal[indices[i]])
             
-            X_nodal, Y_nodal, Z_nodal = R_bi_nodal @ np.array([X_org, Y_org, Z_org])
+    #         X_nodal, Y_nodal, Z_nodal = R_bi_nodal @ np.array([X_org, Y_org, Z_org])
             
-            X_nodal += drone_positions_nodal[indices[i], 0]
-            Y_nodal += drone_positions_nodal[indices[i], 1]
-            Z_nodal += drone_positions_nodal[indices[i], 2]
+    #         X_nodal += drone_positions_nodal[indices[i], 0]
+    #         Y_nodal += drone_positions_nodal[indices[i], 1]
+    #         Z_nodal += drone_positions_nodal[indices[i], 2]
 
-            X_nodal = X_nodal.reshape(100,100)
-            Y_nodal = Y_nodal.reshape(100,100)
-            Z_nodal = Z_nodal.reshape(100,100)
+    #         X_nodal = X_nodal.reshape(100,100)
+    #         Y_nodal = Y_nodal.reshape(100,100)
+    #         Z_nodal = Z_nodal.reshape(100,100)
 
 
-        colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFFFF']
-        labels = ['X', 'Y', 'Z', 'Force']
+    #     colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFFFF']
+    #     labels = ['X', 'Y', 'Z', 'Force']
 
-        for k in range(3):
-            if k < 3:
-                axis = rotated_axes[k]
-                if results_nodal is not None:
-                    axis_nodal = rotated_axes_nodal[k]
-            color = colors[k]
-            label = labels[k]
+    #     for k in range(3):
+    #         if k < 3:
+    #             axis = rotated_axes[k]
+    #             if results_nodal is not None:
+    #                 axis_nodal = rotated_axes_nodal[k]
+    #         color = colors[k]
+    #         label = labels[k]
 
-            if label == 'Force':
-                fig.add_trace(go.Scatter3d(
-                    x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + force[0]],
-                    y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + force[1]],
-                    z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + force[2]],
-                    mode='lines',
-                    line=dict(color=color, width=4),
-                    showlegend=False
-                ))
-            else:
-                fig.add_trace(go.Scatter3d(
-                    x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + axis[0]],
-                    y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + axis[1]],
-                    z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + axis[2]],
-                    mode='lines+text',
-                    line=dict(color=color, width=4),
-                    showlegend=False
-                ))
+    #         if label == 'Force':
+    #             fig.add_trace(go.Scatter3d(
+    #                 x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + force[0]],
+    #                 y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + force[1]],
+    #                 z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + force[2]],
+    #                 mode='lines',
+    #                 line=dict(color=color, width=4),
+    #                 showlegend=False
+    #             ))
+    #         else:
+    #             fig.add_trace(go.Scatter3d(
+    #                 x=[drone_positions[indices[i], 0], drone_positions[indices[i], 0] + axis[0]],
+    #                 y=[drone_positions[indices[i], 1], drone_positions[indices[i], 1] + axis[1]],
+    #                 z=[drone_positions[indices[i], 2], drone_positions[indices[i], 2] + axis[2]],
+    #                 mode='lines+text',
+    #                 line=dict(color=color, width=4),
+    #                 showlegend=False
+    #             ))
 
-                if results_nodal is not None:
-                    fig.add_trace(go.Scatter3d(
-                        x=[drone_positions_nodal[indices[i], 0], drone_positions_nodal[indices[i], 0] + axis_nodal[0]],
-                        y=[drone_positions_nodal[indices[i], 1], drone_positions_nodal[indices[i], 1] + axis_nodal[1]],
-                        z=[drone_positions_nodal[indices[i], 2], drone_positions_nodal[indices[i], 2] + axis_nodal[2]],
-                        mode='lines+text',
-                        line=dict(color=color, width=4),
-                        showlegend=False
-                    ))
+    #             if results_nodal is not None:
+    #                 fig.add_trace(go.Scatter3d(
+    #                     x=[drone_positions_nodal[indices[i], 0], drone_positions_nodal[indices[i], 0] + axis_nodal[0]],
+    #                     y=[drone_positions_nodal[indices[i], 1], drone_positions_nodal[indices[i], 1] + axis_nodal[1]],
+    #                     z=[drone_positions_nodal[indices[i], 2], drone_positions_nodal[indices[i], 2] + axis_nodal[2]],
+    #                     mode='lines+text',
+    #                     line=dict(color=color, width=4),
+    #                     showlegend=False
+    #                 ))
 
-        # Add subject position to data
-        for sub_pose in subs_pose:
-            # Use color iter to change the color of the subject in rgb
-            fig.add_trace(go.Scatter3d(x=[sub_pose[0]], y=[sub_pose[1]], z=[sub_pose[2]], mode='markers', marker=dict(size=10, color=color), name='Subject', showlegend=False))
+    #     # Add subject position to data
+    #     for sub_pose in subs_pose:
+    #         # Use color iter to change the color of the subject in rgb
+    #         fig.add_trace(go.Scatter3d(x=[sub_pose[0]], y=[sub_pose[1]], z=[sub_pose[2]], mode='markers', marker=dict(size=10, color=color), name='Subject', showlegend=False))
             
 
     for obs in obstacles:
@@ -1737,7 +1737,6 @@ def plot_scp_animation(result_ctcs: dict,
     drone_forces = result_ctcs["drone_forces"]
     scp_interp_trajs = result_ctcs["scp_interp"]
     scp_ctcs_trajs = result_ctcs["scp_trajs"]
-    scp_multi_shoot = result_ctcs["scp_multi_shoot"]
     obstacles = result_ctcs["obstacles"]
     gates = result_ctcs["gates"]
     subs_positions = result_ctcs["sub_positions"]
@@ -1752,6 +1751,7 @@ def plot_scp_animation(result_ctcs: dict,
     # fig.update_layout(height=1000)
 
     fig.add_trace(go.Scatter3d(x=drone_positions[:,0], y=drone_positions[:,1], z=drone_positions[:,2], mode='lines', line=dict(color='green', width = 5), name='Nonlinear Propagation'))
+    fig.add_trace(go.Scatter3d(x=scp_ctcs_trajs[-1][0], y=scp_ctcs_trajs[-1][1], z=scp_ctcs_trajs[-1][2], mode='markers', line=dict(color='grey', width = 50), name='Node Points'))
 
     if result_node is not None:
         fig.add_trace(go.Scatter3d(x=drone_positions_node[:,0], y=drone_positions_node[:,1], z=drone_positions_node[:,2], mode='lines', line=dict(color='blue', width = 5), name='Node Nonlinear Propagation'))
@@ -1762,41 +1762,18 @@ def plot_scp_animation(result_ctcs: dict,
     fig.update_layout(scene=dict(aspectmode='manual', aspectratio=dict(x=10, y=10, z=10)))
     fig.update_layout(scene=dict(xaxis=dict(range=[-200, 200]), yaxis=dict(range=[-200, 200]), zaxis=dict(range=[-200, 200])))
 
-    # Extract the number of states and controls from the parameters
-    n_x = params.sim.n_states
-    n_u = params.sim.n_controls
-
-    # Define indices for slicing the augmented state vector
-    i0 = 0
-    i1 = n_x
-    i2 = i1 + n_x * n_x
-    i3 = i2 + n_x * n_u
-    i4 = i3 + n_x * n_u
-    i5 = i4 + n_x
-
     # Plot the attitudes of the SCP Trajs
     frames = []
     traj_iter = 0
-
     for scp_traj in scp_ctcs_trajs:
         drone_positions = scp_traj[0:3]
         drone_attitudes = scp_traj[6:10]
         frame = go.Frame(name=str(traj_iter))
         data = []
-        # Plot the multiple shooting trajectories
-        pos_traj = []
-        if traj_iter < len(scp_multi_shoot):
-            for i_multi in range(scp_multi_shoot[traj_iter].shape[1]):
-                pos_traj.append(scp_multi_shoot[traj_iter][:,i_multi].reshape(-1, i5)[:,0:3])
-            pos_traj = np.array(pos_traj)
-            
-            for j in range(pos_traj.shape[1]):
-                if j == 0:
-                    data.append(go.Scatter3d(x=pos_traj[:,j, 0], y=pos_traj[:,j, 1], z=pos_traj[:,j, 2], mode='lines', legendgroup='Multishot Trajectory', name='Multishot Trajectory ' + str(traj_iter), showlegend=True, line=dict(color='blue', width = 5)))
-                else:
-                    data.append(go.Scatter3d(x=pos_traj[:,j, 0], y=pos_traj[:,j, 1], z=pos_traj[:,j, 2], mode='lines', legendgroup='Multishot Trajectory', showlegend=False, line=dict(color='blue', width = 5)))
+
+        # Plot drone position trajectory
+        data.append(go.Scatter3d(x=drone_positions[0], y=drone_positions[1], z=drone_positions[2], mode='lines', line=dict(color='gray', width = 5), name='CTCS SCP Iteration ' + str(traj_iter)))
         
-            
         for i in range(len(drone_attitudes[0])):
             att = drone_attitudes[:, i]
 
@@ -1967,22 +1944,22 @@ def plot_scp_animation(result_ctcs: dict,
     if not params.vp.tracking:
         fig.update_layout(scene_camera=dict(up=dict(x=0, y=0, z=90), center=dict(x=1, y=0.3, z=1), eye=dict(x=-1, y=2, z=1)))
 
-    # # Make the background transparent
-    # fig.update_layout(scene=dict(bgcolor='rgba(0,0,0,0)'))
-    # # Make the axis backgrounds transparent
-    # fig.update_layout(scene=dict(
-    #     xaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
-    #     yaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
-    #     zaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey')
-    # ))
-    # # Remove the plot background
-    # fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
+    # Make the background transparent
+    fig.update_layout(scene=dict(bgcolor='rgba(0,0,0,0)'))
+    # Make the axis backgrounds transparent
+    fig.update_layout(scene=dict(
+        xaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
+        yaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey'),
+        zaxis=dict(backgroundcolor='rgba(0,0,0,0)', showbackground=False, showgrid=True, gridcolor='grey')
+    ))
+    # Remove the plot background
+    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)')
 
-    # # Make ticks themselves transparent
-    # fig.update_layout(scene=dict(xaxis=dict(showticklabels=False), yaxis=dict(showticklabels=False), zaxis=dict(showticklabels=False)))
+    # Make ticks themselves transparent
+    fig.update_layout(scene=dict(xaxis=dict(showticklabels=False), yaxis=dict(showticklabels=False), zaxis=dict(showticklabels=False)))
 
-    # # Remove the paper background
-    # fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
+    # Remove the paper background
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)')
                       
 
     # Generate embded html
@@ -1990,7 +1967,126 @@ def plot_scp_animation(result_ctcs: dict,
     # Save the html string to a file
     with open(f'{path}results/scp_animation.html', 'w') as f:
         f.write(html_str)
+    fig.show()
 
+def plot_scp_animation_double_integrator(result_ctcs: dict, result_node = None):
+    tof = result_ctcs["tof"]
+    title = f'SCP Simulation: {tof} seconds'
+    drone_positions = result_ctcs["drone_positions"]
+    drone_attitudes = result_ctcs["drone_attitudes"]
+    drone_forces = result_ctcs["drone_forces"]
+    scp_interp_trajs = result_ctcs["scp_interp"]
+    scp_ctcs_trajs = result_ctcs["scp_trajs"]
+    obstacles = result_ctcs["obstacles"]
+    gates = result_ctcs["gates"]
+    if result_node is not None:
+        drone_positions_node = result_node["drone_positions"]
+        scp_node_trajs = result_node["scp_trajs"]
+
+    fig = go.Figure(go.Scatter3d(x=[], y=[], z=[], mode='lines+markers', line=dict(color='gray', width = 2), name='SCP Iterations'))
+    for j in range(200):
+        fig.add_trace(go.Scatter3d(x=[], y=[], z=[], mode='lines+markers', line=dict(color='gray', width = 2)))
+
+    # fig.update_layout(height=1000)
+
+    fig.add_trace(go.Scatter3d(x=drone_positions[:,0], y=drone_positions[:,1], z=drone_positions[:,2], mode='lines', line=dict(color='green', width = 5), name='CTCS Nonlinear Propagation'))
+    fig.add_trace(go.Scatter3d(x=scp_ctcs_trajs[-1][0], y=scp_ctcs_trajs[-1][1], z=scp_ctcs_trajs[-1][2], mode='markers', line=dict(color='grey', width = 50), name='CTCS Node Points'))
+
+    if result_node is not None:
+        fig.add_trace(go.Scatter3d(x=drone_positions_node[:,0], y=drone_positions_node[:,1], z=drone_positions_node[:,2], mode='lines', line=dict(color='blue', width = 5), name='Node Nonlinear Propagation'))
+        fig.add_trace(go.Scatter3d(x=scp_node_trajs[-1][0], y=scp_node_trajs[-1][1], z=scp_node_trajs[-1][2], mode='markers', line=dict(color='grey', width = 50), name='Node Node Points'))
+
+    fig.update_layout(template='plotly_dark', title=title)
+
+    fig.update_layout(scene=dict(aspectmode='manual', aspectratio=dict(x=10, y=10, z=10)))
+    fig.update_layout(scene=dict(xaxis=dict(range=[-200, 200]), yaxis=dict(range=[-200, 200]), zaxis=dict(range=[-200, 200])))
+
+    # Plot the attitudes of the SCP Trajs
+    frames = []
+    traj_iter = 0
+    for scp_traj in scp_ctcs_trajs:
+        drone_positions = scp_traj[0:3]
+        drone_attitudes = scp_traj[6:10]
+        frame = go.Frame(name=str(traj_iter))
+        data = []
+
+        # Plot drone position trajectory
+        data.append(go.Scatter3d(x=drone_positions[0], y=drone_positions[1], z=drone_positions[2], mode='lines', line=dict(color='gray', width = 5), name='CTCS SCP Iteration ' + str(traj_iter)))
+
+        traj_iter += 1  
+        frame.data = data
+        frames.append(frame)
+    fig.frames = frames 
+
+    i = 1
+    for obs in obstacles:
+        n = 30
+        # Generate points on the unit sphere
+        u = np.linspace(0, 2 * np.pi, n)
+        v = np.linspace(0, np.pi, n)
+
+        x = np.outer(np.cos(u), np.sin(v))
+        y = np.outer(np.sin(u), np.sin(v))
+        z = np.outer(np.ones(np.size(u)), np.cos(v))
+
+        # Scale points by radii
+        x = 1/obs.radius[0] * x
+        y = 1/obs.radius[1] * y
+        z = 1/obs.radius[2] * z
+
+        # Rotate and translate points
+        points = np.array([x.flatten(), y.flatten(), z.flatten()])
+        points = obs.axes @ points
+        points = points.T + obs.center
+
+        fig.add_trace(go.Surface(x=points[:, 0].reshape(n,n), y=points[:, 1].reshape(n,n), z=points[:, 2].reshape(n,n), opacity = 0.5, showscale=False))
+
+    for gate in gates:
+        # Plot a line through the vertices of the gate
+        fig.add_trace(go.Scatter3d(x=[gate.vertices[0][0], gate.vertices[1][0], gate.vertices[2][0], gate.vertices[3][0], gate.vertices[0][0]], y=[gate.vertices[0][1], gate.vertices[1][1], gate.vertices[2][1], gate.vertices[3][1], gate.vertices[0][1]], z=[gate.vertices[0][2], gate.vertices[1][2], gate.vertices[2][2], gate.vertices[3][2], gate.vertices[0][2]], mode='lines', line=dict(color='blue', width=10)))
+        # Plot the normal vector of the gate as an arrow
+        # fig.add_trace(go.Cone(x=[gate.center[0]], y=[gate.center[1]], z=[gate.center[2]], u=[gate.normal[0]], v=[gate.normal[1]], w=[gate.normal[2]], showscale=False, sizemode="absolute", sizeref=1.0, anchor="tail", colorscale='Viridis', colorbar=dict(title='Normal Vector')))
+
+    fig.add_trace(go.Surface(x=[-200, 200, 200, -200], y=[-200, -200, 200, 200], z=[[0, 0], [0, 0], [0, 0], [0, 0]], opacity=0.3, showscale=False, colorscale='Greys', showlegend = True, name='Ground Plane'))
+
+    sliders = [
+        {
+            "pad": {"b": 10, "t": 60},
+            "len": 0.9,
+            "x": 0.1,
+            "y": 0,
+            "steps": [
+                {
+                    "args": [[f.name], frame_args(0)],
+                    "label": f.name,
+                    "method": "animate",
+                } for f in fig.frames
+            ]
+        }
+    ]
+
+    fig.update_layout(updatemenus = [{"buttons":[
+                                        {
+                                            "args": [None, frame_args(50)],
+                                            "label": "Play",
+                                            "method": "animate",
+                                        },
+                                        {
+                                            "args": [[None], frame_args(0)],
+                                            "label": "Pause",
+                                            "method": "animate",
+                                    }],
+
+                                    "direction": "left",
+                                    "pad": {"r": 10, "t": 70},
+                                    "type": "buttons",
+                                    "x": 0.1,
+                                    "y": 0,
+                                }
+                            ],
+                            sliders=sliders
+                        )
+    fig.update_layout(sliders=sliders)
     fig.show()
 
 def plot_state(result, params):
@@ -2257,11 +2353,11 @@ def plot_ral_mc_results(CT_mc_results, DT_mc_results, nodes, params, log = False
     # Add error bounds using the min and max los violation values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((CT_los_max, CT_los_min[::-1])).flatten(), fill='toself', fillcolor='rgba(100,161,207,0.2)', line=dict(color='rgba(255,255,255,0)'), showlegend=False, legendgroup="CT-LoS"), row=1, col=1)
     # Plot the runtime on yaxis1 with dashed lines
-    fig.add_trace(go.Scatter(x=nodes, y=CT_los_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(100,161,207)'), marker=dict(size=7.5, color = 'rgb(100,161,207)'), name="CT-LoS", legendgroup="CT-LoS"), row=1, col=1)   
+    fig.add_trace(go.Scatter(x=nodes, y=CT_los_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(100,161,207)'), marker=dict(size=7.5, color = 'rgb(100,161,207)'), name=r"$\text{CT-LoS}$", legendgroup="CT-LoS"), row=1, col=1)   
     
     # Add error bounds using the min and max los violation values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((DT_los_max, DT_los_min[::-1])).flatten(), fill='toself', fillcolor='rgba(204,137,137,0.2)', line=dict(color='rgba(255,255,255,0)'), legendgroup="DT-LoS", showlegend=False), row=1, col=1)
-    fig.add_trace(go.Scatter(x=nodes, y=DT_los_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(204,137,137)'), marker=dict(size=7.5, color = 'rgb(204,137,137)'), name="DT-LoS", legendgroup="DT-LoS"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=nodes, y=DT_los_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(204,137,137)'), marker=dict(size=7.5, color = 'rgb(204,137,137)'), name=r"$\text{DT-LoS}$", legendgroup="DT-LoS"), row=1, col=1)
 
     # Add error bounds using the min and max objective values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((CT_obj_max, CT_obj_min[::-1])).flatten(), fill='toself', fillcolor='rgba(100,161,207,0.2)', line=dict(color='rgba(255,255,255,0)'), legendgroup="CT-LoS", showlegend=False), row=2, col=1)
@@ -2274,7 +2370,7 @@ def plot_ral_mc_results(CT_mc_results, DT_mc_results, nodes, params, log = False
 
     # Set the axis titles
     # fig.update_xaxes(title_text="Nodes", row=1, col=1)
-    fig.update_xaxes(title_text="Nodes", row=2, col=1)
+    fig.update_xaxes(title_text=r"$\text{Nodes}$", row=2, col=1)
 
     fig.update_yaxes(title_text=r"$\mathrm{LoS}_\mathrm{vio}$", row=1, col=1)
     # Make the LoS Violation yaxis on a log scale
@@ -2293,10 +2389,10 @@ def plot_ral_mc_results(CT_mc_results, DT_mc_results, nodes, params, log = False
     fig.update_layout(template='plotly_white')
 
     # Set aspect ratio to be 1:1
-    # fig.update_layout(
-    #     width=400,
-    #     height=350,
-    # )
+    fig.update_layout(
+        width=350,
+        height=250,
+    )
 
     if showlegend:
         fig.update_layout(showlegend=True)
@@ -2326,6 +2422,11 @@ def plot_ral_mc_results(CT_mc_results, DT_mc_results, nodes, params, log = False
         )
     ))
 
+    # Remove legend background
+    fig.update_layout(legend=dict(
+        bgcolor='rgba(0,0,0,0)'
+    ))
+
     # Make the axis labels for the first subplots larger
     fig.update_layout(xaxis=dict(title_font=dict(size=16)))
     fig.update_layout(yaxis=dict(title_font=dict(size=16)))
@@ -2346,31 +2447,31 @@ def plot_ral_mc_results(CT_mc_results, DT_mc_results, nodes, params, log = False
     # else:
     #     fig.write_image("results/ral_mc_results_dr.eps")
 
-    fig.update_layout(template='plotly_dark')
+    # fig.update_layout(template='plotly_dark')
 
-    # Remove background
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+    # # Remove background
+    # fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
 
-    # Make gridlines light grey white
-    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255,255,255,0.1)')
-    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255,255,255,0.1)')
+    # # Make gridlines light grey white
+    # fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255,255,255,0.1)')
+    # fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='rgba(255,255,255,0.1)')
 
-    # Make axis white
-    fig.update_xaxes(linecolor='white')
-    fig.update_yaxes(linecolor='white')
+    # # Make axis white
+    # fig.update_xaxes(linecolor='white')
+    # fig.update_yaxes(linecolor='white')
     
-    # Make ticks white
-    fig.update_xaxes(tickcolor='white')
-    fig.update_yaxes(tickcolor='white')
+    # # Make ticks white
+    # fig.update_xaxes(tickcolor='white')
+    # fig.update_yaxes(tickcolor='white')
 
     # Remove Margins
     fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
 
     # Generate embded html
-    html_str = fig.to_html(full_html=False, include_plotlyjs='cdn', auto_play=False)
-    # Save the html string to a file
-    with open(f'{path}results/results.html', 'w') as f:
-        f.write(html_str)
+    # html_str = fig.to_html(full_html=False, include_plotlyjs='cdn', auto_play=False)
+    # # Save the html string to a file
+    # with open(f'{path}results/results.html', 'w') as f:
+    #     f.write(html_str)
 
     fig.show()
 
@@ -2422,16 +2523,16 @@ def plot_ral_mc_timing_results(CT_mc_results, DT_mc_results, nodes, params, show
     # Add error bounds using the min and max los violation values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((CT_runtime_max, CT_runtime_min[::-1])).flatten(), fill='toself', fillcolor='rgba(100,161,207,0.2)', line=dict(color='rgba(255,255,255,0)'), legendgroup="CT-LoS", showlegend=False), row=1, col=1)
     # Plot the runtime on yaxis1 with dashed lines
-    fig.add_trace(go.Scatter(x=nodes, y=CT_runtime_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(100,161,207)'), marker=dict(size=7.5, color = 'rgb(100,161,207)'), name="CT-LoS", legendgroup="CT-LoS"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=nodes, y=CT_runtime_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(100,161,207)'), marker=dict(size=7.5, color = 'rgb(100,161,207)'), name=r"$\text{CT-LoS}$", legendgroup="CT-LoS"), row=1, col=1)
     
     # Add error bounds using the min and max los violation values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((DT_runtime_max, DT_runtime_min[::-1])).flatten(), fill='toself', fillcolor='rgba(204,137,137,0.2)', line=dict(color='rgba(255,255,255,0)'), legendgroup="DT-LoS", showlegend=False), row=1, col=1)
-    fig.add_trace(go.Scatter(x=nodes, y=DT_runtime_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(204,137,137)'), marker=dict(size=7.5, color = 'rgb(204,137,137)'), name="DT-LoS", legendgroup="DT-LoS"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=nodes, y=DT_runtime_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(204,137,137)'), marker=dict(size=7.5, color = 'rgb(204,137,137)'), name=r"$\text{DT-LoS}$", legendgroup="DT-LoS"), row=1, col=1)
 
     # Add error bounds using the min and max objective values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((CT_iters_max, CT_iters_min[::-1])).flatten(), fill='toself', fillcolor='rgba(100,161,207,0.2)', line=dict(color='rgba(255,255,255,0)'), legendgroup="CT-LoS", showlegend=False), row=2, col=1)
     # Plot the objective values on yaxis2
-    fig.add_trace(go.Scatter(x=nodes, y=CT_iters_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(100,161,207)'), marker=dict(size=7.5, color = 'rgb(100,161,207)'), name="CT-LoS", legendgroup="CT-LoS", showlegend=False), row=2, col=1)
+    fig.add_trace(go.Scatter(x=nodes, y=CT_iters_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(100,161,207)'), marker=dict(size=7.5, color = 'rgb(100,161,207)'), legendgroup="CT-LoS", showlegend=False), row=2, col=1)
     
     # Add a red horizontal line at the maximum number of iterations
     # only plot the horizontal line if the max iterations of either ctlos ro dtlos is ever at 200
@@ -2441,14 +2542,14 @@ def plot_ral_mc_timing_results(CT_mc_results, DT_mc_results, nodes, params, show
 
     # Add error bounds using the min and max objective values
     fig.add_trace(go.Scatter(x=nodes+nodes[::-1], y=np.array((DT_iters_max, DT_iters_min[::-1])).flatten(), fill='toself', fillcolor='rgba(204,137,137,0.2)', line=dict(color='rgba(255,255,255,0)'), legendgroup="DT-LoS", showlegend=False), row=2, col=1)
-    fig.add_trace(go.Scatter(x=nodes, y=DT_iters_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(204,137,137)'), marker=dict(size=7.5, color = 'rgb(204,137,137)'), name="DT-LoS", legendgroup="DT-LoS", showlegend=False), row=2, col=1)
+    fig.add_trace(go.Scatter(x=nodes, y=DT_iters_avg, mode='lines+markers', line=dict(dash='dot', color = 'rgb(204,137,137)'), marker=dict(size=7.5, color = 'rgb(204,137,137)'), legendgroup="DT-LoS", showlegend=False), row=2, col=1)
 
     # Set the axis titles
     # fig.update_xaxes(title_text=r"Nodes}$", row=1, col=1)
-    fig.update_xaxes(title_text="Nodes", row=2, col=1)
+    fig.update_xaxes(title_text=r"$\text{Nodes}$", row=2, col=1)
 
-    fig.update_yaxes(title_text="Runtime (s)", row=1, col=1)
-    fig.update_yaxes(title_text="Iterations", row=2, col=1)
+    fig.update_yaxes(title_text=r"$\text{Runtime (s)}$", row=1, col=1)
+    fig.update_yaxes(title_text=r"$\text{Iterations}$", row=2, col=1)
     
     # Move the xaxes titles of 2nd subplot up
     fig.update_xaxes(title_standoff=0, row=1, col=1)
@@ -2457,11 +2558,11 @@ def plot_ral_mc_timing_results(CT_mc_results, DT_mc_results, nodes, params, show
     fig.update_layout(template='plotly_white')
 
     # Set aspect ratio to be 1:1
-    # fig.update_layout(
-    #     autosize=False,
-    #     width=400,
-    #     height=350,
-    # )
+    fig.update_layout(
+        autosize=False,
+        width=350,
+        height=250,
+    )
 
     # Show tik marks on x and y axis
     fig.update_xaxes(showticklabels=True, ticks="outside", tickwidth=2, tickcolor='black')
@@ -2476,7 +2577,7 @@ def plot_ral_mc_timing_results(CT_mc_results, DT_mc_results, nodes, params, show
         yanchor="top",
         y=0.99,
         xanchor="right",
-        x=0.32
+        x=0.4
     ))
 
     # Make the legend bigger
@@ -2485,6 +2586,12 @@ def plot_ral_mc_timing_results(CT_mc_results, DT_mc_results, nodes, params, show
             size=16,
         )
     ))
+
+    # Remove legend background
+    fig.update_layout(legend=dict(
+        bgcolor='rgba(0,0,0,0)'
+    ))
+    
 
     # Make the axis labels for the first subplots larger
     fig.update_layout(xaxis=dict(title_font=dict(size=16)))
@@ -2509,31 +2616,33 @@ def plot_ral_mc_timing_results(CT_mc_results, DT_mc_results, nodes, params, show
     #     fig.write_image("results/ral_mc_timing_results_dr.eps")
 
     # Make plot dark
-    fig.update_layout(template='plotly_dark')
+    # fig.update_layout(template='plotly_dark')
 
     # Remove background
-    fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+    # fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
 
-    # Make gridlines white
-    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='white')
-    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='white')
+    # # Make gridlines white
+    # fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='white')
+    # fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='white')
 
-    # Make axis white
-    fig.update_xaxes(linecolor='white')
-    fig.update_yaxes(linecolor='white')
+    # # Make axis white
+    # fig.update_xaxes(linecolor='white')
+    # fig.update_yaxes(linecolor='white')
     
-    # Make ticks white
-    fig.update_xaxes(tickcolor='white')
-    fig.update_yaxes(tickcolor='white')
+    # # Make ticks white
+    # fig.update_xaxes(tickcolor='white')
+    # fig.update_yaxes(tickcolor='white')
 
 
     # Remove Margins
     fig.update_layout(margin=dict(l=0, r=0, t=0, b=0))
 
+    # fig.update_yaxes(type='log', row=1, col=1)
+
     # Generate embded html
-    html_str = fig.to_html(full_html=False, include_plotlyjs='cdn', auto_play=False)
-    # Save the html string to a file
-    with open(f'{path}results/timing_results.html', 'w') as f:
-        f.write(html_str)
+    # html_str = fig.to_html(full_html=False, include_plotlyjs='cdn', auto_play=False)
+    # # Save the html string to a file
+    # with open(f'{path}results/timing_results.html', 'w') as f:
+    #     f.write(html_str)
 
     fig.show()
