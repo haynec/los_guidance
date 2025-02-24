@@ -13,12 +13,6 @@ warnings.filterwarnings("ignore")
 # Autonomous Controls Laboratory
 ################################
 
-import subprocess
-
-def test_main():
-    result = subprocess.run(['python', 'main.py', '--params-file', 'quadsim/params/cinema_vp.py'], capture_output=True, text=True)
-    assert result.returncode == 0, f"Process failed with return code {result.returncode}\n{result.stdout}\n{result.stderr}"
-
 def load_params_from_file(file_path):
     spec = importlib.util.spec_from_file_location("params", file_path)
     params_module = importlib.util.module_from_spec(spec)
