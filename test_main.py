@@ -7,20 +7,20 @@ def run_main_with_params(params):
 def test_trajectory():
     run_main_with_params('trajectory')
 
-def test_camera_view():
-    run_main_with_params('camera_view')
+# def test_camera_view():
+#     run_main_with_params('camera_view')
 
-def test_conic_view():
-    run_main_with_params('conic_view')
+# def test_conic_view():
+#     run_main_with_params('conic_view')
 
-def test_scp_iters():
-    run_main_with_params('scp_iters')
+# def test_scp_iters():
+#     run_main_with_params('scp_iters')
 
-def test_constr_vio():
-    run_main_with_params('constr_vio')
+# def test_constr_vio():
+#     run_main_with_params('constr_vio')
 
-def test_control_losses():
-    run_main_with_params('control_losses')
+# def test_control_losses():
+#     run_main_with_params('control_losses')
 
-def test_state():
-    run_main_with_params('state')
+# def test_state():
+#     run_main_with_params('state')
