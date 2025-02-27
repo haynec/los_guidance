@@ -159,15 +159,16 @@ Distributed under the GPL-3.0 License. See `LICENSE.txt` for more information.
 ## Citation
 Please cite as 
 ```
-@misc{hayner2024los,
-                  title={Continuous-Time Line-of-Sight Constrained Trajectory Planning for 6-Degree of Freedom Systems}, 
-                  author={Christopher R. Hayner and John M. Carson III and Behçet Açıkmeşe and Karen Leung},
-                  year={2024},
-                  eprint={2410.22596},
-                  archivePrefix={arXiv},
-                  primaryClass={math.OC},
-                  url={https://arxiv.org/abs/2410.22596}, 
-            }
+@ARTICLE{10902120,
+  author={Hayner, Christopher R. and Carson III, John M. and Açıkmeşe, Behçet and Leung, Karen},
+  journal={IEEE Robotics and Automation Letters}, 
+  title={Continuous-Time Line-of-Sight Constrained Trajectory Planning for 6-Degree of Freedom Systems}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1-8},
+  keywords={Robot sensing systems;Vectors;Vehicle dynamics;Line-of-sight propagation;Trajectory planning;Trajectory optimization;Quadrotors;Nonlinear dynamical systems;Heuristic algorithms;Convergence;Constrained Motion Planning;Optimization and Optimal Control;Aerial Systems: Perception and Autonomy},
+  doi={10.1109/LRA.2025.3545299}}
 ```
 
 
